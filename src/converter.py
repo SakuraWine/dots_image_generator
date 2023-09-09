@@ -55,6 +55,7 @@ class DotsImageGenerator(object):
         Returns:
             str: dots
         """
+        # TODO: 調整するかも
         if brightness < 10:
             return "⣿"
         elif brightness < 64:
