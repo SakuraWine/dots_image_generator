@@ -1,32 +1,36 @@
 import cv2
 import cv2.typing
-import numpy as np
 
 
 class DotsImageGenerator(object):
     def __init__(self) -> None:
+        """constructor
+        """
         pass
 
-    def generate(self, source_path: str, output_directory: str, output_filename: str, level: int) -> None:
-        # read
-        image = cv2.imread(source_path, cv2.IMREAD_COLOR)
-        # resize
-        image_resized = cv2.resize(image, None, None, 1.0, 0.5)
-        # to grayscale
-        image_gray = cv2.cvtColor(image_resized, cv2.COLOR_BGR2GRAY)
-        self.to_dots(image=image_gray, level=level, output_path=output_directory+output_filename)
+    def to_dots(self, image: cv2.typing.MatLike, level: int) -> None:
+        """get dots image from normal image
 
-    def to_dots(self, image: cv2.typing.MatLike, level: int, output_path: str) -> np.ndarray:
-        source = self.resize_image(image=image, level=level)
-        cv2.imwrite(output_path, source)
+        Args:
+            image (cv2.typing.MatLike): source
+            level (int): level
+        """
+        image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        source = self.resize_image(image=image_gray, level=level)
         for column in source:
-            row_str = []
             for row in column:
-                # row_str.append(self.get_dot(row))
-                print(self.get_dot(row), end="")
+                print(self.get_dots(row), end="")
             print()
 
-    def get_dot(self, brightness: int) -> str:
+    def get_dots(self, brightness: int) -> str:
+        """convert brightness to dots
+
+        Args:
+            brightness (int): brightness
+
+        Returns:
+            str: dots
+        """
         if brightness < 10:
             return "⣿"
         elif brightness < 64:
@@ -39,8 +43,19 @@ class DotsImageGenerator(object):
             return " "
 
     def resize_image(self, image: cv2.typing.MatLike, level: int) -> cv2.typing.MatLike:
-        image_rescaled = cv2.resize(image, None, None, 1.0, 0.5)
-        if level == 4:
+        """resize image
+
+        Args:
+            image (cv2.typing.MatLike): source
+            level (int): level
+
+        Returns:
+            cv2.typing.MatLike: resized image
+        """
+        image_rescaled = cv2.resize(image, None, None, 1.0, 0.7)
+        if level == 5:
+            image_resized = cv2.resize(image_rescaled, None, None, 0.15, 0.15)
+        elif level == 4:
             image_resized = cv2.resize(image_rescaled, None, None, 0.25, 0.25)
         elif level == 3:
             image_resized = cv2.resize(image_rescaled, None, None, 0.5, 0.5)
@@ -53,9 +68,20 @@ class DotsImageGenerator(object):
             image_resized = image_rescaled
         return image_resized
 
+    def generate(self, source_path: str, level: int) -> None:
+        """execute
 
-# 読み込み → リサイズ → グレスケ → 点群画像生成 → 書き出し
+        Args:
+            source_path (str): source path
+            level (int): _description_
+        """
+        # read
+        image = cv2.imread(source_path, cv2.IMREAD_COLOR)
+        # resize
+        image_resized = cv2.resize(image, None, None, 1.0, 0.5)
+        # to grayscale
+        self.to_dots(image=image_resized, level=level)
+
 
 generator = DotsImageGenerator()
-generator.generate("/home/sakura/workspace/image_to_dots_image_converter/data/sample_miyako.png",
-                  "/home/sakura/workspace/image_to_dots_image_converter/output/",  "sample_miyako.png", 3)
+generator.generate("/home/sakura/workspace/dots_image_generator/data/sample_miyako.png", 5)
