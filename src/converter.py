@@ -22,8 +22,6 @@ class DotsImageGenerator(object):
             image (cv2.typing.MatLike): source
             level (int): level
         """
-        # 元画像のサイズを覚えとく
-        height, width, channels = image.shape[:3]
         # 輝度値を見るための形式へ変換
         image_resized = cv2.resize(image, None, None, 1.0, 0.5)
         image_gray = cv2.cvtColor(image_resized, cv2.COLOR_BGR2GRAY)
@@ -41,9 +39,9 @@ class DotsImageGenerator(object):
             dots_str = "".join(dots_list)
             dots_lines.append(dots_str)
         # 出力
-        self.output_dots_image(width, height, dots_lines, level)
+        self.output_dots_image(dots_lines, level)
 
-    def output_dots_image(self, width: int, height: int, dots_lines: List[str], level: int) -> None:
+    def output_dots_image(self, dots_lines: List[str], level: int) -> None:
         """点字データから点字風画像を生成する
 
         Args:
@@ -142,4 +140,7 @@ parser.add_argument("-l", "--level")
 args = parser.parse_args()
 generator = DotsImageGenerator()
 source = os.path.join(os.path.dirname(__file__), "../data/", args.source_image)
-generator.generate(source, int(args.level))
+if os.path.exists(source):
+    generator.generate(source, int(args.level))
+else:
+    print("Source image file not found. ({})".format(args.source_image))
