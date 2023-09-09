@@ -78,15 +78,15 @@ class DotsImageGenerator(object):
             cv2.typing.MatLike: resized image
         """
         image_rescaled = cv2.resize(image, None, None, 1.0, 0.7)
-        if level == 1:
+        if level == 5:
             image_resized = cv2.resize(image_rescaled, None, None, 0.15, 0.15)
-        elif level == 2:
+        elif level == 4:
             image_resized = cv2.resize(image_rescaled, None, None, 0.25, 0.25)
         elif level == 3:
             image_resized = cv2.resize(image_rescaled, None, None, 0.5, 0.5)
-        elif level == 4:
+        elif level == 2:
             image_resized = cv2.resize(image_rescaled, None, None, 0.75, 0.75)
-        elif level == 5:
+        elif level == 1:
             image_resized = image_rescaled
         else:
             print("Invalid level.")
@@ -106,10 +106,11 @@ class DotsImageGenerator(object):
         self.to_dots(image=image, level=level)
 
 
-parser = argparse.ArgumentParser(description="generate dots image from .png")
+parser = argparse.ArgumentParser(description="generate dots image from image")
 parser.add_argument("-s", "--source_image")
+parser.add_argument("-l", "--level")
 args = parser.parse_args()
 generator = DotsImageGenerator()
 sources = glob.glob("./data/" + args.source_image)
 for source in sources:
-    generator.generate(source, 1)
+    generator.generate(source, int(args.level))
