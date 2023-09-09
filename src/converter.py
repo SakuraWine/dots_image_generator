@@ -5,6 +5,9 @@ import numpy._typing
 from typing import List, Optional
 import argparse
 import os
+from PIL import Image, ImageDraw, ImageFont
+
+# Consolas
 
 
 class DotsImageGenerator(object):
@@ -39,14 +42,30 @@ class DotsImageGenerator(object):
             dots_str = "".join(dots_list)
             dots_lines.append(dots_str)
         # 出力
-        for line in dots_lines:
-            print(line)
-        blank_image = np.zeros((height, width, 1))
-        self.draw_dots(blank_image, dots_lines)
+        self.output_dots_image(width, height, dots_lines)
 
-    def draw_dots(self, image: numpy._typing.NDArray, dots_lines: List[str]) -> bool:
-        # TODO: drawing dots to blank image is not implemented.
-        return True
+    def output_dots_image(self, width: int, height: int, dots_lines: List[str]) -> None:
+        """点字データから点字風画像を生成する
+
+        Args:
+            width (int): 元画像の横
+            height (int): 元画像の縦
+            dots_lines (List[str]): 点字データ
+        """
+        # NOTE: 十分入るようにサイズ大きめにとる
+        output_image = Image.new("L", (width * 10, height * 10), color=0)
+        draw = ImageDraw.Draw(output_image)
+        # NOTE: フォントの読み込みだけ色々大変だった
+        #       これはWSL2環境用で、それ以外で動くようにはなっていない
+        #       また、別途WSL2上からWindowsのフォントが参照できるように設定する必要がある()
+        font = ImageFont.truetype(font="/mnt/c/Windows/Fonts/seguisym.ttf", size=10, encoding="utf-8")
+        dots = ""
+        for line in dots_lines:
+            dots += "\n" + line
+        draw.text((0, 0), dots, "white", font=font)
+        print(dots)
+        output = os.path.join(os.path.dirname(__file__), "../output/", "output.png")
+        output_image.save(output)
 
     def get_dots(self, brightness: int) -> str:
         """convert brightness to dots
