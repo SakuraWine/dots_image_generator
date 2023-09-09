@@ -3,8 +3,8 @@ import cv2.typing
 import numpy as np
 import numpy._typing
 from typing import List
-import glob
 import argparse
+import os
 
 
 class DotsImageGenerator(object):
@@ -111,6 +111,5 @@ parser.add_argument("-s", "--source_image")
 parser.add_argument("-l", "--level")
 args = parser.parse_args()
 generator = DotsImageGenerator()
-sources = glob.glob("./data/" + args.source_image)
-for source in sources:
-    generator.generate(source, int(args.level))
+source = os.path.join(os.path.dirname(__file__), "../data/", args.source_image)
+generator.generate(source, int(args.level))
