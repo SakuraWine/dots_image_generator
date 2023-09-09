@@ -2,7 +2,7 @@
 
 画像ファイルから点字で描かれた画像を出力する。
 
-## Install
+## Installation
 
 ```bash
 git clone https://github.com/SakuraWine/dots_image_generator.git
