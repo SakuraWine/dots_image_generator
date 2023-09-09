@@ -1,12 +1,9 @@
 import cv2
 import cv2.typing
-import numpy as np
-import numpy._typing
 from typing import List, Optional
 import argparse
 import os
 from PIL import Image, ImageDraw, ImageFont
-import math
 
 
 class DotsImageGenerator(object):
@@ -15,8 +12,8 @@ class DotsImageGenerator(object):
         """
         pass
 
-    def to_dots(self, image: cv2.typing.MatLike, level: int) -> None:
-        """get dots image from normal image
+    def to_dots(self, image: cv2.typing.MatLike, level: int) -> List[str]:
+        """画像ファイルから点字風画像の文字列を生成する。
 
         Args:
             image (cv2.typing.MatLike): source
@@ -27,7 +24,7 @@ class DotsImageGenerator(object):
         image_gray = cv2.cvtColor(image_resized, cv2.COLOR_BGR2GRAY)
         source = self.resize_image(image=image_gray, level=level)
         if source is None:
-            return
+            return []
         # 輝度値を点字に変換
         dots_lines: List[str] = []
         for column in source:
@@ -35,13 +32,12 @@ class DotsImageGenerator(object):
             for row in column:
                 dots = self.get_dots(row)
                 dots_list.append(dots)
-            # 一文字ずつの文字の配列を一続きの文字列へ変換する
+            # 一文字ずつの文字の配列をひと続きの文字列へ変換する
             dots_str = "".join(dots_list)
             dots_lines.append(dots_str)
-        # 出力
-        self.output_dots_image(dots_lines, level)
+        return dots_lines
 
-    def output_dots_image(self, dots_lines: List[str], level: int) -> None:
+    def output_dots_image(self, dots_lines: List[str]) -> None:
         """点字データから点字風画像を生成する
 
         Args:
@@ -102,7 +98,7 @@ class DotsImageGenerator(object):
             level (int): level
 
         Returns:
-            cv2.typing.MatLike: resized image
+            Optional[cv2.typing.MatLike]: resized image
         """
         # 色々試行錯誤した結果サイズ調整は必要なくなったが、一応残しておく
         image_rescaled = cv2.resize(image, None, None, 1.0, 1.0)
@@ -122,16 +118,15 @@ class DotsImageGenerator(object):
         return image_resized
 
     def generate(self, source_path: str, level: int) -> None:
-        """execute
+        """実行関数
 
         Args:
             source_path (str): source path
-            level (int): _description_
+            level (int): 難易度
         """
-        # read
         image = cv2.imread(source_path, cv2.IMREAD_COLOR)
-        # to grayscale
-        self.to_dots(image=image, level=level)
+        dots_lines = self.to_dots(image=image, level=level)
+        self.output_dots_image(dots_lines)
 
 
 parser = argparse.ArgumentParser(description="generate dots image from image")
