@@ -2,7 +2,7 @@ import cv2
 import cv2.typing
 import numpy as np
 import numpy._typing
-from typing import List
+from typing import List, Optional
 import argparse
 import os
 
@@ -26,6 +26,8 @@ class DotsImageGenerator(object):
         image_resized = cv2.resize(image, None, None, 1.0, 0.5)
         image_gray = cv2.cvtColor(image_resized, cv2.COLOR_BGR2GRAY)
         source = self.resize_image(image=image_gray, level=level)
+        if source is None:
+            return
         # 輝度値を点字に変換
         dots_lines: List[str] = []
         for column in source:
@@ -67,8 +69,8 @@ class DotsImageGenerator(object):
         else:
             return " "
 
-    def resize_image(self, image: cv2.typing.MatLike, level: int) -> cv2.typing.MatLike:
-        """resize image
+    def resize_image(self, image: cv2.typing.MatLike, level: int) -> Optional[cv2.typing.MatLike]:
+        """レベル設定に応じて出力画像をリサイズする
 
         Args:
             image (cv2.typing.MatLike): source
@@ -90,7 +92,7 @@ class DotsImageGenerator(object):
             image_resized = image_rescaled
         else:
             print("Invalid level.")
-            image_resized = image_rescaled
+            return None
         return image_resized
 
     def generate(self, source_path: str, level: int) -> None:
