@@ -4,6 +4,7 @@ import numpy as np
 import numpy._typing
 from typing import List
 import glob
+import argparse
 
 
 class DotsImageGenerator(object):
@@ -104,7 +105,10 @@ class DotsImageGenerator(object):
         self.to_dots(image=image, level=level)
 
 
+parser = argparse.ArgumentParser(description="generate dots image from .png")
+parser.add_argument("-s", "--source_image")
+args = parser.parse_args()
 generator = DotsImageGenerator()
-sources = glob.glob("./data/*.png")
+sources = glob.glob("./data/" + args.source_image)
 for source in sources:
     generator.generate(source, 1)
