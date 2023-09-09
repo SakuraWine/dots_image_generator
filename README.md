@@ -28,5 +28,7 @@ python ./src/converter.py -s <source_filename> -l <level>
 ## Example
 
 ```bash
-python ./src/converter.py -s sample.png -l 5
+python ./src/converter.py -s sample.png -l 3
 ```
+
+![demo_image](docs/images/demo.png "demo_image")
