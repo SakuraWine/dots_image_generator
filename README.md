@@ -1,4 +1,4 @@
-# dots image converter
+# dots image generator
 
 画像ファイルから点字で描かれた画像を出力する。
 
