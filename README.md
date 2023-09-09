@@ -12,13 +12,16 @@ pip install -r requirements.txt
 
 ## Usage
 
+1. 使用する画像を`data`ディレクトリ内へ入れる。
+1. `convert.py`を実行する。
+
 ```bash
-python ./src/converter.py -s <path_to_source> -l <level>
+python ./src/converter.py -s <source_filename> -l <level>
 ```
 
 ## Args
 
-- -s [--source-image] 元画像のパス
+- -s [--source-image] 元画像のファイル名
 - -l [--level] 難易度（大きいほど低い解像度の画像が出力される）
 
 
