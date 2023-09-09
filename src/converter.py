@@ -6,8 +6,7 @@ from typing import List, Optional
 import argparse
 import os
 from PIL import Image, ImageDraw, ImageFont
-
-# Consolas
+import math
 
 
 class DotsImageGenerator(object):
@@ -42,9 +41,9 @@ class DotsImageGenerator(object):
             dots_str = "".join(dots_list)
             dots_lines.append(dots_str)
         # 出力
-        self.output_dots_image(width, height, dots_lines)
+        self.output_dots_image(width, height, dots_lines, level)
 
-    def output_dots_image(self, width: int, height: int, dots_lines: List[str]) -> None:
+    def output_dots_image(self, width: int, height: int, dots_lines: List[str], level: int) -> None:
         """点字データから点字風画像を生成する
 
         Args:
@@ -52,9 +51,6 @@ class DotsImageGenerator(object):
             height (int): 元画像の縦
             dots_lines (List[str]): 点字データ
         """
-        # NOTE: 十分入るようにサイズ大きめにとる
-        output_image = Image.new("L", (width * 10, height * 10), color=0)
-        draw = ImageDraw.Draw(output_image)
         # NOTE: フォントの読み込みだけ色々大変だった
         #       これはWSL2環境用で、それ以外で動くようにはなっていない
         #       また、別途WSL2上からWindowsのフォントが参照できるように設定する必要がある()
@@ -62,8 +58,20 @@ class DotsImageGenerator(object):
         dots = ""
         for line in dots_lines:
             dots += "\n" + line
-        draw.text((0, 0), dots, "white", font=font)
-        print(dots)
+        dots = dots[1:]     # 先頭の改行だけ削除
+        # 1文字あたりの縦横のpixel数（結構適当に数えて決めた）
+        # NOTE: 多少大きめに取る
+        horizontal_character_px = 4
+        vertical_px = 8
+        horizontal_blank_px = 4
+        vertical_blank_px = 8
+        num_characters_one_line = len(dots_lines[0])
+        num_lines = len(dots_lines)
+        # 点字風画像を生成
+        output_image = Image.new("L", (horizontal_character_px * num_characters_one_line + horizontal_blank_px * num_characters_one_line,
+                                       vertical_px * num_lines + vertical_blank_px * num_lines), color=0)
+        draw = ImageDraw.Draw(output_image)
+        draw.text((0, 0), dots, "white", font=font, spacing=4)
         output = os.path.join(os.path.dirname(__file__), "../output/", "output.png")
         output_image.save(output)
 
@@ -82,11 +90,11 @@ class DotsImageGenerator(object):
         elif brightness < 64:
             return "⠿"
         elif brightness < 128:
-            return "⠇"
+            return "⠞"
         elif brightness < 224:
-            return "⠂"
+            return "⠓"
         else:
-            return " "
+            return "⠂"
 
     def resize_image(self, image: cv2.typing.MatLike, level: int) -> Optional[cv2.typing.MatLike]:
         """レベル設定に応じて出力画像をリサイズする
@@ -98,7 +106,8 @@ class DotsImageGenerator(object):
         Returns:
             cv2.typing.MatLike: resized image
         """
-        image_rescaled = cv2.resize(image, None, None, 1.0, 0.7)
+        # 色々試行錯誤した結果サイズ調整は必要なくなったが、一応残しておく
+        image_rescaled = cv2.resize(image, None, None, 1.0, 1.0)
         if level == 5:
             image_resized = cv2.resize(image_rescaled, None, None, 0.15, 0.15)
         elif level == 4:
